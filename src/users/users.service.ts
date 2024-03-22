@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { UserExistsException } from '../authentication/exception/user-exists.exception';
+import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,10 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+
+  public findAll(): Promise<User[]> {
+    return this.userRepository.find({});
+  }
 
   /**
    * @summary Get user by email address
@@ -28,8 +33,13 @@ export class UsersService {
    * @param username {string}
    * @return Promise<User>
    */
-  public getByUsername(username: string): Promise<User> {
-    return this.userRepository.findOneBy({ username });
+  public async getByUsername(username: string): Promise<User> {
+    const user: User | null = await this.userRepository.findOneBy({ username });
+    if (!user) {
+      throw new UserNotFoundException('requested username is not found');
+    }
+
+    return user;
   }
 
   /**

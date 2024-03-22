@@ -19,9 +19,7 @@ export class AuthenticationService {
     private JwtService: JwtService,
     @Inject(AUTHENTICATION_MODULE_OPTIONS)
     private options: AuthenticationModuleOptions,
-  ) {
-    console.log('------>>>', options);
-  }
+  ) {}
 
   public async signup(userInfo: SignupRequestDto) {
     const user: CreateUserDto = new CreateUserDto();
