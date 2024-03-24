@@ -11,6 +11,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationModuleOptions } from './interfaces/AuthenticationModuleOptions';
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
+import { UserNotFoundException } from './exception/user-not-found.exception';
 
 @Injectable()
 export class AuthenticationService {
@@ -34,14 +35,16 @@ export class AuthenticationService {
   }
 
   public async login(loginInfo: LoginRequestDto): Promise<LoginResponseDto> {
-    const user: User | null = await this.usersService.getByUsername(
-      loginInfo.username,
-    );
     const wrongInformationException: WrongLoginInfoException =
       new WrongLoginInfoException('username');
 
-    if (!user) {
-      throw wrongInformationException;
+    let user: User | null;
+    try {
+      user = await this.usersService.getByUsername(loginInfo.username);
+    } catch (e) {
+      if (e instanceof UserNotFoundException) {
+        throw wrongInformationException;
+      }
     }
 
     if (!(await this.validatePassword(loginInfo.password, user.password))) {

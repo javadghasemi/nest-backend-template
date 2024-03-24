@@ -19,7 +19,10 @@ import { WrongLoginInfoException } from './exception/wrong-login-info.exception'
 import { LoginResponseDto } from './dto/login-response.dto';
 import { AuthGuard } from './guards/AuthGuard';
 
-@Controller('authentication@1')
+@Controller({
+  version: '1',
+  path: 'authentication',
+})
 export class AuthenticationController {
   constructor(private authenticationService: AuthenticationService) {}
 

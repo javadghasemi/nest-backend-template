@@ -16,7 +16,7 @@ export class UsersService {
   ) {}
 
   public findAll(): Promise<User[]> {
-    return this.userRepository.find({});
+    return this.userRepository.find();
   }
 
   /**
@@ -48,10 +48,14 @@ export class UsersService {
    * @return Promise<CreateUserResponseDto>
    */
   public async create(userInfo: CreateUserDto): Promise<CreateUserResponseDto> {
-    await Promise.all([
+    const existsResult: boolean[] = await Promise.all([
       this.checkEmailExists(userInfo.email),
       this.checkUsernameExists(userInfo.username),
     ]);
+
+    if (existsResult.includes(false)) {
+      throw new UserExistsException();
+    }
 
     const user = new User();
 
@@ -68,17 +72,19 @@ export class UsersService {
     return this.manipulateResponse(userInfo);
   }
 
+  public async delete(username: string): Promise<void> {
+    const user: User = await this.getByUsername(username);
+
+    await this.userRepository.delete(user);
+  }
+
   /**
    * @summary Check email exists in database
    * @param email {string}
    * @private
    */
-  private async checkEmailExists(email: string): Promise<void> {
-    const user: User | null = await this.getByEmail(email);
-
-    if (user) {
-      throw new UserExistsException('email');
-    }
+  private async checkEmailExists(email: string): Promise<boolean> {
+    return this.userRepository.existsBy({ email });
   }
 
   /**
@@ -86,12 +92,8 @@ export class UsersService {
    * @param username
    * @private
    */
-  private async checkUsernameExists(username: string): Promise<void> {
-    const user: User | null = await this.getByUsername(username);
-
-    if (user) {
-      throw new UserExistsException('username');
-    }
+  private async checkUsernameExists(username: string): Promise<boolean> {
+    return this.userRepository.existsBy({ username });
   }
 
   /**
