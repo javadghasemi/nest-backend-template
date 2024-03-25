@@ -17,7 +17,7 @@ import { CreateUserResponseDto } from '../users/dto/create-user-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
 import { LoginResponseDto } from './dto/login-response.dto';
-import { AuthGuard } from './guards/AuthGuard';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller({
   version: '1',

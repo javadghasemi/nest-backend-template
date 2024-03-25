@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '../authentication/entity/user.entity';
+import { User } from './entity/user.entity';
 import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
 
 @Controller({

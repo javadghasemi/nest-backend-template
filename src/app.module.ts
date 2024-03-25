@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './authentication/entity/user.entity';
+import { User } from './users/entity/user.entity';
 import { UsersModule } from './users/users.module';
 import { AuthenticationStrategy } from './authentication/enums';
 import { ConfigModule, ConfigService } from '@nestjs/config';

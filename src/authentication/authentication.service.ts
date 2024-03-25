@@ -5,7 +5,7 @@ import { SignupRequestDto } from './dto/signup-request.dto';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { User } from './entity/user.entity';
+import { User } from '../users/entity/user.entity';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
