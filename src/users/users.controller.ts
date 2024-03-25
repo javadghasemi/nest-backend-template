@@ -1,5 +1,7 @@
 import {
+  Body,
   ClassSerializerInterceptor,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -8,11 +10,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entity/user.entity';
 import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserExistsException } from '../authentication/exception/user-exists.exception';
 
 @Controller({
   version: '1',
@@ -38,6 +43,18 @@ export class UsersController {
       }
 
       throw new InternalServerErrorException();
+    }
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post()
+  public async create(@Body() userInfo: CreateUserDto) {
+    try {
+      return await this.usersService.create(userInfo);
+    } catch (e) {
+      if (e instanceof UserExistsException) {
+        throw new ConflictException(e.message);
+      }
     }
   }
 
