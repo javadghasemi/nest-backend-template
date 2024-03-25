@@ -48,28 +48,26 @@ export class UsersService {
    * @return Promise<CreateUserResponseDto>
    */
   public async create(userInfo: CreateUserDto): Promise<CreateUserResponseDto> {
-    const existsResult: boolean[] = await Promise.all([
-      this.checkEmailExists(userInfo.email),
-      this.checkUsernameExists(userInfo.username),
-    ]);
-
-    if (existsResult.includes(false)) {
-      throw new UserExistsException();
-    }
-
-    const user = new User();
+    await this.checkEmailAndUsernameExists(userInfo.username, userInfo.email);
 
     const password = await bcrypt.hash(userInfo.password, 10);
 
-    user.firstName = userInfo.firstName;
-    user.lastName = userInfo.lastName;
-    user.email = userInfo.email;
-    user.username = userInfo.username;
-    user.password = password;
+    const user = new User(
+      userInfo.firstName,
+      userInfo.lastName,
+      userInfo.email,
+      userInfo.username,
+      password,
+    );
 
     await this.userRepository.save(user);
 
-    return this.manipulateResponse(userInfo);
+    return new CreateUserResponseDto(
+      user.firstName,
+      user.lastName,
+      user.email,
+      user.username,
+    );
   }
 
   public async delete(username: string): Promise<void> {
@@ -96,19 +94,31 @@ export class UsersService {
     return this.userRepository.existsBy({ username });
   }
 
-  /**
-   * @summary Manipulate create user response
-   * @param userInfo {CreateUserDto}
-   * @private
-   * @return CreateUserResponseDto
-   */
-  private manipulateResponse(userInfo: CreateUserDto): CreateUserResponseDto {
-    const response = new CreateUserResponseDto();
-    response.firstName = userInfo.firstName;
-    response.lastName = userInfo.lastName;
-    response.email = userInfo.email;
-    response.username = userInfo.username;
+  private async checkEmailAndUsernameExists(username: string, email: string) {
+    const checkInfoDetails = [
+      {
+        checkerName: 'username',
+        method: this.checkUsernameExists(username),
+      },
+      {
+        checkerName: 'email',
+        method: this.checkEmailExists(email),
+      },
+    ];
 
-    return response;
+    const rawResponse = await Promise.allSettled([
+      checkInfoDetails[0].method,
+      checkInfoDetails[1].method,
+    ]);
+
+    const response = rawResponse.filter(
+      (res) => res.status === 'fulfilled',
+    ) as PromiseFulfilledResult<any>[];
+
+    response.forEach((resultElement, index) => {
+      if (resultElement.value) {
+        throw new UserExistsException(checkInfoDetails[index].checkerName);
+      }
+    });
   }
 }
