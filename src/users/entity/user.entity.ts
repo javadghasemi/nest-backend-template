@@ -7,16 +7,15 @@ export class User {
     firstName?: string,
     lastName?: string,
     email?: string,
-    username?: string,
     password?: string,
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
-    this.username = username;
     this.password = password;
   }
 
+  @Exclude()
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -28,9 +27,6 @@ export class User {
 
   @Column()
   public email: string;
-
-  @Column()
-  public username: string;
 
   @Column()
   @Exclude()

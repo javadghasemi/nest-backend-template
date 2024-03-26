@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+
+import { User } from './entity/user.entity';
+import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { UserExistsException } from '../authentication/exception/user-exists.exception';
 import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
+import { UpdateUserRequestDto } from './dto/update-user-request.dto';
+import { UpdateUserResponseDto } from './dto/update-user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,54 +27,67 @@ export class UsersService {
    * @param email {string}
    * @return Promise<User>
    */
-  public getByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ email });
-  }
+  public async getByEmail(email: string): Promise<User> {
+    const user: User | null = await this.userRepository.findOneBy({ email });
 
-  /**
-   * @summary Get user by username
-   * @param username {string}
-   * @return Promise<User>
-   */
-  public async getByUsername(username: string): Promise<User> {
-    const user: User | null = await this.userRepository.findOneBy({ username });
-    if (!user) {
-      throw new UserNotFoundException('requested username is not found');
-    }
+    if (!user) throw new UserNotFoundException('email');
 
     return user;
   }
 
   /**
    * @summary Create new user
-   * @param userInfo {CreateUserDto}
+   * @param userInfo {CreateUserRequestDto}
    * @return Promise<CreateUserResponseDto>
    */
-  public async create(userInfo: CreateUserDto): Promise<CreateUserResponseDto> {
-    await this.checkEmailAndUsernameExists(userInfo.username, userInfo.email);
+  public async create(
+    userInfo: CreateUserRequestDto,
+  ): Promise<CreateUserResponseDto> {
+    await this.checkIdentificationExists(userInfo.email);
 
-    const password = await bcrypt.hash(userInfo.password, 10);
+    const password = await this.hashPassword(userInfo.password);
 
     const user = new User(
       userInfo.firstName,
       userInfo.lastName,
       userInfo.email,
-      userInfo.username,
       password,
     );
 
     await this.userRepository.save(user);
 
-    return new CreateUserResponseDto(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.username,
+    return new CreateUserResponseDto(user.firstName, user.lastName, user.email);
+  }
+
+  public async update(
+    email: string,
+    userInfo: UpdateUserRequestDto,
+  ): Promise<UpdateUserResponseDto> {
+    const user = await this.getByEmail(email);
+
+    if (userInfo.email !== user.email) {
+      await this.checkIdentificationExists(userInfo.email);
+    }
+
+    const password = await this.hashPassword(userInfo.password);
+
+    const updatedUser = await this.userRepository.save({
+      id: user.id,
+      firstName: userInfo.firstName,
+      lastName: userInfo.lastName,
+      email: userInfo.email,
+      password,
+    });
+
+    return new UpdateUserResponseDto(
+      updatedUser.firstName,
+      updatedUser.lastName,
+      updatedUser.email,
     );
   }
 
-  public async delete(username: string): Promise<void> {
-    const user: User = await this.getByUsername(username);
+  public async delete(email: string): Promise<void> {
+    const user: User = await this.getByEmail(email);
 
     await this.userRepository.delete(user);
   }
@@ -85,40 +101,13 @@ export class UsersService {
     return this.userRepository.existsBy({ email });
   }
 
-  /**
-   * @summary Check Username exists in database
-   * @param username
-   * @private
-   */
-  private async checkUsernameExists(username: string): Promise<boolean> {
-    return this.userRepository.existsBy({ username });
+  private async checkIdentificationExists(email: string) {
+    const existsStatus = await this.checkEmailExists(email);
+
+    if (existsStatus) throw new UserExistsException('email');
   }
 
-  private async checkEmailAndUsernameExists(username: string, email: string) {
-    const checkInfoDetails = [
-      {
-        checkerName: 'username',
-        method: this.checkUsernameExists(username),
-      },
-      {
-        checkerName: 'email',
-        method: this.checkEmailExists(email),
-      },
-    ];
-
-    const rawResponse = await Promise.allSettled([
-      checkInfoDetails[0].method,
-      checkInfoDetails[1].method,
-    ]);
-
-    const response = rawResponse.filter(
-      (res) => res.status === 'fulfilled',
-    ) as PromiseFulfilledResult<any>[];
-
-    response.forEach((resultElement, index) => {
-      if (resultElement.value) {
-        throw new UserExistsException(checkInfoDetails[index].checkerName);
-      }
-    });
+  private async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
   }
 }

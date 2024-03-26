@@ -13,10 +13,6 @@ export class SignupRequestDto {
   @IsString()
   public email: string;
 
-  @Length(3)
-  @IsString()
-  public username: string;
-
   @IsStrongPassword()
   @Length(6)
   @IsString()

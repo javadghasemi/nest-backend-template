@@ -11,13 +11,17 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entity/user.entity';
 import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { UserExistsException } from '../authentication/exception/user-exists.exception';
+import { CreateUserResponseDto } from './dto/create-user-response.dto';
+import { UpdateUserRequestDto } from './dto/update-user-request.dto';
+import { UpdateUserResponseDto } from './dto/update-user-response.dto';
 
 @Controller({
   version: '1',
@@ -33,10 +37,10 @@ export class UsersController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get(':username')
-  public async getOne(@Param('username') username: string): Promise<User> {
+  @Get(':email')
+  public async getOne(@Param('email') email: string): Promise<User> {
     try {
-      return await this.usersService.getByUsername(username);
+      return await this.usersService.getByEmail(email);
     } catch (e) {
       if (e instanceof UserNotFoundException) {
         throw new NotFoundException(e.message);
@@ -48,7 +52,9 @@ export class UsersController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  public async create(@Body() userInfo: CreateUserDto) {
+  public async create(
+    @Body() userInfo: CreateUserRequestDto,
+  ): Promise<CreateUserResponseDto> {
     try {
       return await this.usersService.create(userInfo);
     } catch (e) {
@@ -58,11 +64,19 @@ export class UsersController {
     }
   }
 
+  @Put(':email')
+  public async update(
+    @Param('email') email: string,
+    @Body() userInfo: UpdateUserRequestDto,
+  ): Promise<UpdateUserResponseDto> {
+    return await this.usersService.update(email, userInfo);
+  }
+
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':username')
-  public async delete(@Param('username') username: string): Promise<void> {
+  @Delete(':email')
+  public async delete(@Param('email') email: string): Promise<void> {
     try {
-      await this.usersService.delete(username);
+      await this.usersService.delete(email);
     } catch (e) {
       if (e instanceof UserNotFoundException) {
         throw new NotFoundException(e.message);

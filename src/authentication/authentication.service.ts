@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import { SignupRequestDto } from './dto/signup-request.dto';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserRequestDto } from '../users/dto/create-user-request.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { User } from '../users/entity/user.entity';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
@@ -23,12 +23,11 @@ export class AuthenticationService {
   ) {}
 
   public async signup(userInfo: SignupRequestDto) {
-    const user: CreateUserDto = new CreateUserDto();
+    const user: CreateUserRequestDto = new CreateUserRequestDto();
 
     user.firstName = userInfo.firstName;
     user.lastName = userInfo.lastName;
     user.email = userInfo.email;
-    user.username = userInfo.username;
     user.password = userInfo.password;
 
     return await this.usersService.create(user);
@@ -36,11 +35,11 @@ export class AuthenticationService {
 
   public async login(loginInfo: LoginRequestDto): Promise<LoginResponseDto> {
     const wrongInformationException: WrongLoginInfoException =
-      new WrongLoginInfoException('username');
+      new WrongLoginInfoException('email');
 
     let user: User | null;
     try {
-      user = await this.usersService.getByUsername(loginInfo.username);
+      user = await this.usersService.getByEmail(loginInfo.email);
     } catch (e) {
       if (e instanceof UserNotFoundException) {
         throw wrongInformationException;
@@ -51,9 +50,9 @@ export class AuthenticationService {
       throw wrongInformationException;
     }
 
-    const payload: { sub: number; username: string } = {
+    const payload: { sub: number; email: string } = {
       sub: user.id,
-      username: user.username,
+      email: user.email,
     };
 
     const accessToken: string = await this.JwtService.signAsync(payload);
