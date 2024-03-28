@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,8 +16,9 @@ export class Product {
   @PrimaryGeneratedColumn()
   public id: number;
 
+  @Generated('increment')
   @Column()
-  public productId: string;
+  public productId: number;
 
   @Column()
   public name: string;
@@ -28,7 +30,7 @@ export class Product {
   public thumbnail: string;
 
   @Column('text', { array: true })
-  public photoAlbum: string[];
+  public photos: string[];
 
   @ManyToOne(() => User, (user) => user.products)
   public createdBy: User;
