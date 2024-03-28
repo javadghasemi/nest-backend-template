@@ -16,9 +16,9 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entity/user.entity';
-import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
+import { UserNotFoundException } from './exception/user-not-found.exception';
 import { CreateUserRequestDto } from './dto/create-user-request.dto';
-import { UserExistsException } from '../authentication/exception/user-exists.exception';
+import { UserExistsException } from './exception/user-exists.exception';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';

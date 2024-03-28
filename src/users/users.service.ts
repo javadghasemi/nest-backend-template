@@ -6,8 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entity/user.entity';
 import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
-import { UserExistsException } from '../authentication/exception/user-exists.exception';
-import { UserNotFoundException } from '../authentication/exception/user-not-found.exception';
+import { UserExistsException } from './exception/user-exists.exception';
+import { UserNotFoundException } from './exception/user-not-found.exception';
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { UpdateUserResponseDto } from './dto/update-user-response.dto';
 

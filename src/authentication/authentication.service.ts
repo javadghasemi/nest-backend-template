@@ -11,7 +11,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationModuleOptions } from './interfaces/AuthenticationModuleOptions';
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
-import { UserNotFoundException } from './exception/user-not-found.exception';
+import { UserNotFoundException } from '../users/exception/user-not-found.exception';
 
 @Injectable()
 export class AuthenticationService {
