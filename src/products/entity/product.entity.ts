@@ -1,11 +1,17 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { User } from '../../users/entity/user.entity';
 
+@Entity()
 export class Product {
   @Exclude()
   @PrimaryGeneratedColumn()
@@ -26,13 +32,12 @@ export class Product {
   @Column('text', { array: true })
   public photoAlbum: string[];
 
-  @CreateDateColumn({ type: 'timestamp', default: 'CURRENT_TIMESTAMP(6)' })
+  @ManyToOne(() => User, (user) => user.products)
+  public createdBy: User;
+
+  @CreateDateColumn()
   public createdAt: Date;
 
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
+  @UpdateDateColumn()
   public updatedAt: Date;
 }

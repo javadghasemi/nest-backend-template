@@ -89,7 +89,7 @@ export class UsersService {
   public async delete(email: string): Promise<void> {
     const user: User = await this.getByEmail(email);
 
-    await this.userRepository.delete(user);
+    await this.userRepository.remove(user);
   }
 
   /**
