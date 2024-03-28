@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthenticationStrategy } from './authentication/enums';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
+import { Product } from './products/entity/product.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ProductsModule } from './products/products.module';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User],
+        entities: [User, Product],
         synchronize: Boolean(configService.get('DATABASE_SYNCHRONIZE')),
       }),
       inject: [ConfigService],
