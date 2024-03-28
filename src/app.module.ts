@@ -5,6 +5,7 @@ import { User } from './users/entity/user.entity';
 import { UsersModule } from './users/users.module';
 import { AuthenticationStrategy } from './authentication/enums';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
     }),
     UsersModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
