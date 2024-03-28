@@ -1,7 +1,21 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
+  constructor(
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    password?: string,
+  ) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+  }
+
+  @Exclude()
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -15,8 +29,6 @@ export class User {
   public email: string;
 
   @Column()
-  public username: string;
-
-  @Column()
+  @Exclude()
   public password: string;
 }

@@ -3,14 +3,15 @@ import * as bcrypt from 'bcrypt';
 
 import { SignupRequestDto } from './dto/signup-request.dto';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserRequestDto } from '../users/dto/create-user-request.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
-import { User } from './entity/user.entity';
+import { User } from '../users/entity/user.entity';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthenticationModuleOptions } from './interfaces/AuthenticationModuleOptions';
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
+import { UserNotFoundException } from '../users/exception/user-not-found.exception';
 
 @Injectable()
 export class AuthenticationService {
@@ -19,40 +20,39 @@ export class AuthenticationService {
     private JwtService: JwtService,
     @Inject(AUTHENTICATION_MODULE_OPTIONS)
     private options: AuthenticationModuleOptions,
-  ) {
-    console.log('------>>>', options);
-  }
+  ) {}
 
   public async signup(userInfo: SignupRequestDto) {
-    const user: CreateUserDto = new CreateUserDto();
+    const user: CreateUserRequestDto = new CreateUserRequestDto();
 
     user.firstName = userInfo.firstName;
     user.lastName = userInfo.lastName;
     user.email = userInfo.email;
-    user.username = userInfo.username;
     user.password = userInfo.password;
 
     return await this.usersService.create(user);
   }
 
   public async login(loginInfo: LoginRequestDto): Promise<LoginResponseDto> {
-    const user: User | null = await this.usersService.getByUsername(
-      loginInfo.username,
-    );
     const wrongInformationException: WrongLoginInfoException =
-      new WrongLoginInfoException('username');
+      new WrongLoginInfoException('email');
 
-    if (!user) {
-      throw wrongInformationException;
+    let user: User | null;
+    try {
+      user = await this.usersService.getByEmail(loginInfo.email);
+    } catch (e) {
+      if (e instanceof UserNotFoundException) {
+        throw wrongInformationException;
+      }
     }
 
     if (!(await this.validatePassword(loginInfo.password, user.password))) {
       throw wrongInformationException;
     }
 
-    const payload: { sub: number; username: string } = {
+    const payload: { sub: number; email: string } = {
       sub: user.id,
-      username: user.username,
+      email: user.email,
     };
 
     const accessToken: string = await this.JwtService.signAsync(payload);
