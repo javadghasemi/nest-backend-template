@@ -1,6 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { CreateProductDto } from './dto/CreateProduct.dto';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { CreateProductDto } from './dto/create-product.dto';
 import { ProductsService } from './products.service';
+import { User } from '../authentication/decorator/user.decorator';
+import { LoggedInUserInterface } from '../authentication/interfaces/logged-in-user.interface';
+import { AuthGuard } from '../authentication/guards/auth.guard';
 
 @Controller({
   path: 'products',
@@ -9,7 +12,11 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
   @Post()
-  public create(@Body() product: CreateProductDto) {
-    return this.productsService.create();
+  @UseGuards(AuthGuard)
+  public create(
+    @Body() product: CreateProductDto,
+    @User() user: LoggedInUserInterface,
+  ) {
+    return this.productsService.create(product, user);
   }
 }

@@ -28,12 +28,12 @@ import { Product } from './products/entity/product.entity';
       }),
       inject: [ConfigService],
     }),
-    AuthenticationModule.register({
+    AuthenticationModule.forRoot({
       strategy: AuthenticationStrategy.Bearer,
       jwtOptions: {
         secret: 'THIS IS SECRET KEY',
         signOptions: {
-          expiresIn: '60s',
+          expiresIn: '3000s',
         },
       },
     }),
