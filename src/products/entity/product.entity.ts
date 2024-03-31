@@ -16,10 +16,6 @@ export class Product {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Generated('increment')
-  @Column()
-  public productId: number;
-
   @Column()
   public name: string;
 
@@ -40,4 +36,18 @@ export class Product {
 
   @UpdateDateColumn()
   public updatedAt: Date;
+
+  constructor(
+    name?: string,
+    price?: number,
+    thumbnail?: string,
+    photos?: string[],
+    createdBy?: User,
+  ) {
+    this.name = name;
+    this.price = price;
+    this.thumbnail = thumbnail;
+    this.photos = photos;
+    this.createdBy = createdBy;
+  }
 }

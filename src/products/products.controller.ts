@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductRequestDto } from './dto/create-product-request.dto';
 import { ProductsService } from './products.service';
 import { User } from '../authentication/decorator/user.decorator';
 import { LoggedInUserInterface } from '../authentication/interfaces/logged-in-user.interface';
@@ -14,7 +14,7 @@ export class ProductsController {
   @Post()
   @UseGuards(AuthGuard)
   public create(
-    @Body() product: CreateProductDto,
+    @Body() product: CreateProductRequestDto,
     @User() user: LoggedInUserInterface,
   ) {
     return this.productsService.create(product, user);

@@ -24,7 +24,7 @@ export class AuthenticationModule {
     }
 
     return {
-      global: true,
+      global: options.global || false,
       module: AuthenticationModule,
       imports,
       providers: [

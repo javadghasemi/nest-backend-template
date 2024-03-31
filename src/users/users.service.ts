@@ -22,6 +22,10 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  public getById(id: number) {
+    return this.userRepository.findOneBy({ id });
+  }
+
   /**
    * @summary Get user by email address
    * @param email {string}

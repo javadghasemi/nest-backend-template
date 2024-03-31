@@ -29,6 +29,7 @@ import { Product } from './products/entity/product.entity';
       inject: [ConfigService],
     }),
     AuthenticationModule.forRoot({
+      global: true,
       strategy: AuthenticationStrategy.Bearer,
       jwtOptions: {
         secret: 'THIS IS SECRET KEY',
