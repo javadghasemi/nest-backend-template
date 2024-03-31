@@ -19,6 +19,20 @@ export class ProductsService {
   ) {
     this.hashids = new Hashids('', 5);
   }
+
+  public getAll(): Promise<Product[]> {
+    return this.productRepository.find({
+      relations: ['createdBy'],
+      select: {
+        createdBy: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    });
+  }
+
   public async create(
     product: CreateProductRequestDto,
     user: LoggedInUserInterface,
