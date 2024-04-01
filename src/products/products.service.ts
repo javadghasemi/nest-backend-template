@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateProductRequestDto } from './dto/create-product-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entity/product.entity';
@@ -12,18 +12,16 @@ import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { GetProductResponseDto } from './dto/get-product-response.dto';
 import { HashidsNotValidException } from './exception/hashids-not-valid.exception';
 import { ProductNotFoundException } from './exception/product-not-found.exception';
+import { HASH_IDS_TOKEN } from './constants';
 
 @Injectable()
 export class ProductsService {
-  private hashids: Hashids;
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
     private usersService: UsersService,
-  ) {
-    this.hashids = new Hashids('', 5);
-  }
+    @Inject(HASH_IDS_TOKEN) private hashids: Hashids,
+  ) {}
 
-  public hashRecords(products) {}
   public getAll(): Promise<Product[]> {
     return this.productRepository.find({
       relations: ['createdBy'],

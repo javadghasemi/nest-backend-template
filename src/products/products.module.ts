@@ -6,7 +6,8 @@ import { Product } from './entity/product.entity';
 import { UsersModule } from '../users/users.module';
 // @ts-ignore
 import * as Hashids from 'hashids';
-import { ProductSubscriber } from './subscribers/product.subscriber';
+import { ProductSubscriber } from './subscriber/product.subscriber';
+import { HASH_IDS_TOKEN } from './constants';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Product]), UsersModule],
@@ -24,10 +25,9 @@ export class ProductsModule {
         ProductsService,
         ProductSubscriber,
         {
-          provide: 'HASH_IDS',
-          useFactory: () => {
-            return new Hashids(options.hashids.salt, options.hashids.minLength);
-          },
+          provide: HASH_IDS_TOKEN,
+          useFactory: () =>
+            new Hashids(options.hashids.salt, options.hashids.minLength),
         },
       ],
       controllers: [ProductsController],

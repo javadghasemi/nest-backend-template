@@ -1,3 +1,1 @@
-// import * as Hashids from 'hashids';
-//
-// export const hashid = new Hashids('', 5);
+export const HASH_IDS_TOKEN = Symbol('HASH_IDS_TOKEN');
