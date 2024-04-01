@@ -37,15 +37,15 @@ export class ProductsService {
     });
   }
 
-  public async getOne(hashids: string): Promise<GetProductResponseDto> {
-    this.validateHashids(hashids);
+  public async getOne(productId: string): Promise<GetProductResponseDto> {
+    this.validateHashids(productId);
 
-    const productId: number = this.hashids.decode(hashids)[0] as number;
+    const primaryId: number = this.hashids.decode(productId)[0] as number;
 
-    const product: Product = await this.getById(productId);
+    const product: Product = await this.getById(primaryId);
 
     return new GetProductResponseDto(
-      hashids,
+      productId,
       product.name,
       product.price,
       product.thumbnail,

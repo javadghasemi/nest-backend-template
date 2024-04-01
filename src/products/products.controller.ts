@@ -1,8 +1,11 @@
 import {
   Body,
   ClassSerializerInterceptor,
+  ConflictException,
   Controller,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   UseGuards,
@@ -16,6 +19,8 @@ import { AuthGuard } from '../authentication/guards/auth.guard';
 import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { Product } from './entity/product.entity';
 import { GetProductResponseDto } from './dto/get-product-response.dto';
+import { HashidsNotValidException } from './exception/hashids-not-valid.exception';
+import { ProductNotFoundException } from './exception/product-not-found.exception';
 
 @Controller({
   path: 'products',
@@ -31,11 +36,21 @@ export class ProductsController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get(':hashids')
+  @Get(':productId')
   public async getOne(
-    @Param('hashids') hashids: string,
+    @Param('productId') productId: string,
   ): Promise<GetProductResponseDto> {
-    return await this.productsService.getOne(hashids);
+    try {
+      return await this.productsService.getOne(productId);
+    } catch (e) {
+      if (e instanceof HashidsNotValidException) {
+        throw new ConflictException(e.message);
+      } else if (e instanceof ProductNotFoundException) {
+        throw new NotFoundException(e.message);
+      }
+
+      throw new InternalServerErrorException();
+    }
   }
 
   @Post()
