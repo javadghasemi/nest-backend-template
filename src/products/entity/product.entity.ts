@@ -1,8 +1,8 @@
 import {
+  AfterLoad,
   Column,
   CreateDateColumn,
   Entity,
-  Generated,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,6 +15,8 @@ export class Product {
   @Exclude()
   @PrimaryGeneratedColumn()
   public id: number;
+
+  public productId: string;
 
   @Column()
   public name: string;

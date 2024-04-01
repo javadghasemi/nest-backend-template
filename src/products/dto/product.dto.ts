@@ -1,4 +1,5 @@
 export abstract class ProductDto {
+  public productId: string;
   public name: string;
   public price: number;
   public thumbnail: string;

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreateProductRequestDto } from './dto/create-product-request.dto';
 import { ProductsService } from './products.service';
 import { User } from '../authentication/decorator/user.decorator';
@@ -6,6 +15,7 @@ import { LoggedInUserInterface } from '../authentication/interfaces/logged-in-us
 import { AuthGuard } from '../authentication/guards/auth.guard';
 import { CreateProductResponseDto } from './dto/create-product-response.dto';
 import { Product } from './entity/product.entity';
+import { GetProductResponseDto } from './dto/get-product-response.dto';
 
 @Controller({
   path: 'products',
@@ -14,9 +24,18 @@ import { Product } from './entity/product.entity';
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   public getAll(): Promise<Product[]> {
     return this.productsService.getAll();
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':hashids')
+  public async getOne(
+    @Param('hashids') hashids: string,
+  ): Promise<GetProductResponseDto> {
+    return await this.productsService.getOne(hashids);
   }
 
   @Post()

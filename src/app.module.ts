@@ -39,7 +39,12 @@ import { Product } from './products/entity/product.entity';
       },
     }),
     UsersModule,
-    ProductsModule,
+    ProductsModule.register({
+      hashids: {
+        salt: '',
+        minLength: 5,
+      },
+    }),
   ],
   controllers: [],
   providers: [],
