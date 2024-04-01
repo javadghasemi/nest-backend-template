@@ -4,8 +4,7 @@ import {
   EventSubscriber,
 } from 'typeorm';
 import { Product } from '../entity/product.entity';
-// @ts-ignore
-import * as Hashids from 'hashids';
+import Hashids from 'hashids';
 import { Inject } from '@nestjs/common';
 import { HASH_IDS_TOKEN } from '../constants';
 

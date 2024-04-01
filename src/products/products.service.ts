@@ -4,8 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entity/product.entity';
 import { Repository } from 'typeorm';
 import { LoggedInUserInterface } from '../authentication/interfaces/logged-in-user.interface';
-// @ts-ignore
-import * as Hashids from 'hashids';
+import Hashids from 'hashids';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entity/user.entity';
 import { CreateProductResponseDto } from './dto/create-product-response.dto';

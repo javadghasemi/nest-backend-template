@@ -4,8 +4,7 @@ import { ProductsController } from './products.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entity/product.entity';
 import { UsersModule } from '../users/users.module';
-// @ts-ignore
-import * as Hashids from 'hashids';
+import Hashids from 'hashids';
 import { ProductSubscriber } from './subscriber/product.subscriber';
 import { HASH_IDS_TOKEN } from './constants';
 
