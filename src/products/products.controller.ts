@@ -3,7 +3,10 @@ import {
   ClassSerializerInterceptor,
   ConflictException,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -53,6 +56,7 @@ export class ProductsController {
     }
   }
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   @UseGuards(AuthGuard)
   public create(
@@ -60,5 +64,12 @@ export class ProductsController {
     @User() user: LoggedInUserInterface,
   ): Promise<CreateProductResponseDto> {
     return this.productsService.create(product, user);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':productId')
+  @UseGuards(AuthGuard)
+  public remove(@Param('productId') productId: string): Promise<void> {
+    return this.productsService.remove(productId);
   }
 }

@@ -75,6 +75,16 @@ export class ProductsService {
     );
   }
 
+  public async remove(productId: string): Promise<void> {
+    this.validateHashids(productId);
+
+    const id: number = this.hashids.decode(productId)[0] as number;
+
+    const product: Product = await this.getById(id);
+
+    await this.productRepository.remove(product);
+  }
+
   private validateHashids(hashids: string): void {
     if (!this.hashids.isValidId(hashids)) {
       throw new HashidsNotValidException();
@@ -82,10 +92,14 @@ export class ProductsService {
   }
 
   private async getById(id: number): Promise<Product> {
-    try {
-      return await this.productRepository.findOneBy({ id });
-    } catch (e) {
+    if (!(await this.checkExistsById(id))) {
       throw new ProductNotFoundException();
     }
+
+    return await this.productRepository.findOneBy({ id });
+  }
+
+  public async checkExistsById(id: number): Promise<boolean> {
+    return this.productRepository.existsBy({ id });
   }
 }

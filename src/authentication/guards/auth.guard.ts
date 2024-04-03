@@ -1,12 +1,9 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthenticationModuleOptionsInterface } from '../interfaces/authentication-module-options.interface';
-import { AUTHENTICATION_MODULE_OPTIONS } from '../constants';
 import { Request } from 'express';
 import { LoggedInUserInterface } from '../interfaces/logged-in-user.interface';
 import { AuthenticationService } from '../authentication.service';
