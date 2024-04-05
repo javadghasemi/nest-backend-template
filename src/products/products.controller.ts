@@ -11,6 +11,8 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
+  UnprocessableEntityException,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,6 +26,8 @@ import { Product } from './entity/product.entity';
 import { GetProductResponseDto } from './dto/get-product-response.dto';
 import { HashidsNotValidException } from './exception/hashids-not-valid.exception';
 import { ProductNotFoundException } from './exception/product-not-found.exception';
+import { UpdateProductRequestDto } from './dto/update-product-request.dto';
+import { UpdateProductResponseDto } from './dto/update-product-response.dto';
 
 @Controller({
   path: 'products',
@@ -66,10 +70,31 @@ export class ProductsController {
     return this.productsService.create(product, user);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Put(':productId')
+  @UseGuards(AuthGuard)
+  public async update(
+    @Param('productId') productId: string,
+    @Body() product: UpdateProductRequestDto,
+    @User() user: LoggedInUserInterface,
+  ): Promise<UpdateProductResponseDto> {
+    return this.productsService.update(productId, product, user);
+  }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':productId')
   @UseGuards(AuthGuard)
-  public remove(@Param('productId') productId: string): Promise<void> {
-    return this.productsService.remove(productId);
+  public async remove(@Param('productId') productId: string): Promise<void> {
+    try {
+      return await this.productsService.remove(productId);
+    } catch (e) {
+      if (e instanceof ProductNotFoundException) {
+        throw new NotFoundException(e.message);
+      } else if (e instanceof HashidsNotValidException) {
+        throw new UnprocessableEntityException(e.message);
+      }
+
+      throw new InternalServerErrorException();
+    }
   }
 }

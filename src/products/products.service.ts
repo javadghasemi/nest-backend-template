@@ -12,6 +12,8 @@ import { GetProductResponseDto } from './dto/get-product-response.dto';
 import { HashidsNotValidException } from './exception/hashids-not-valid.exception';
 import { ProductNotFoundException } from './exception/product-not-found.exception';
 import { HASH_IDS_TOKEN } from './constants';
+import { UpdateProductRequestDto } from './dto/update-product-request.dto';
+import { UpdateProductResponseDto } from './dto/update-product-response.dto';
 
 @Injectable()
 export class ProductsService {
@@ -35,7 +37,7 @@ export class ProductsService {
   }
 
   public async getOne(productId: string): Promise<GetProductResponseDto> {
-    this.validateHashids(productId);
+    this.validateHashid(productId);
 
     const primaryId: number = this.hashids.decode(productId)[0] as number;
 
@@ -75,20 +77,52 @@ export class ProductsService {
     );
   }
 
-  public async remove(productId: string): Promise<void> {
-    this.validateHashids(productId);
-
+  public async update(
+    productId: string,
+    product: UpdateProductRequestDto,
+    user: LoggedInUserInterface,
+  ): Promise<UpdateProductResponseDto> {
     const id: number = this.hashids.decode(productId)[0] as number;
+    const updatedProduct: Product = await this.productRepository.save({
+      id,
+      name: product.name,
+      price: product.price,
+      photos: product.photos,
+      thumbnail: product.thumbnail,
+    });
+
+    return new UpdateProductResponseDto(
+      productId,
+      updatedProduct.name,
+      updatedProduct.price,
+      updatedProduct.thumbnail,
+      updatedProduct.photos,
+    );
+  }
+
+  public async remove(productId: string): Promise<void> {
+    this.validateHashid(productId);
+
+    const id: number = this.decodeHashid(productId);
 
     const product: Product = await this.getById(id);
 
     await this.productRepository.remove(product);
   }
 
-  private validateHashids(hashids: string): void {
+  private validateHashid(hashids: string): void {
     if (!this.hashids.isValidId(hashids)) {
       throw new HashidsNotValidException();
     }
+  }
+
+  private decodeHashid(productId: string): number {
+    const id = this.hashids.decode(productId);
+    if (id.length === 0) {
+      throw new HashidsNotValidException();
+    }
+
+    return id[0] as number;
   }
 
   private async getById(id: number): Promise<Product> {
@@ -100,6 +134,9 @@ export class ProductsService {
   }
 
   public async checkExistsById(id: number): Promise<boolean> {
+    if (!id) {
+      return false;
+    }
     return this.productRepository.existsBy({ id });
   }
 }
