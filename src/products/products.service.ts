@@ -83,12 +83,16 @@ export class ProductsService {
     user: LoggedInUserInterface,
   ): Promise<UpdateProductResponseDto> {
     const id: number = this.decodeHashid(productId);
+
+    const updaterUser: User = await this.usersService.getById(user.sub);
+
     const updatedProduct: Product = await this.productRepository.save({
       id,
       name: product.name,
       price: product.price,
       photos: product.photos,
       thumbnail: product.thumbnail,
+      updatedBy: updaterUser,
     });
 
     return new UpdateProductResponseDto(
