@@ -15,6 +15,7 @@ import {
   UnprocessableEntityException,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateProductRequestDto } from './dto/create-product-request.dto';
 import { ProductsService } from './products.service';
@@ -64,7 +65,7 @@ export class ProductsController {
   @Post()
   @UseGuards(AuthGuard)
   public create(
-    @Body() product: CreateProductRequestDto,
+    @Body(new ValidationPipe()) product: CreateProductRequestDto,
     @User() user: LoggedInUserInterface,
   ): Promise<CreateProductResponseDto> {
     return this.productsService.create(product, user);
@@ -75,7 +76,7 @@ export class ProductsController {
   @UseGuards(AuthGuard)
   public async update(
     @Param('productId') productId: string,
-    @Body() product: UpdateProductRequestDto,
+    @Body(new ValidationPipe()) product: UpdateProductRequestDto,
     @User() user: LoggedInUserInterface,
   ): Promise<UpdateProductResponseDto> {
     try {
