@@ -9,9 +9,10 @@ import { User } from '../users/entity/user.entity';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { JwtService } from '@nestjs/jwt';
-import { AuthenticationModuleOptions } from './interfaces/AuthenticationModuleOptions';
+import { AuthenticationModuleOptionsInterface } from './interfaces/authentication-module-options.interface';
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
 import { UserNotFoundException } from '../users/exception/user-not-found.exception';
+import { LoggedInUserInterface } from './interfaces/logged-in-user.interface';
 
 @Injectable()
 export class AuthenticationService {
@@ -19,7 +20,7 @@ export class AuthenticationService {
     private usersService: UsersService,
     private JwtService: JwtService,
     @Inject(AUTHENTICATION_MODULE_OPTIONS)
-    private options: AuthenticationModuleOptions,
+    private options: AuthenticationModuleOptionsInterface,
   ) {}
 
   public async signup(userInfo: SignupRequestDto) {
@@ -50,7 +51,7 @@ export class AuthenticationService {
       throw wrongInformationException;
     }
 
-    const payload: { sub: number; email: string } = {
+    const payload: LoggedInUserInterface = {
       sub: user.id,
       email: user.email,
     };
@@ -58,6 +59,12 @@ export class AuthenticationService {
     const accessToken: string = await this.JwtService.signAsync(payload);
 
     return new LoginResponseDto(accessToken);
+  }
+
+  public async validateToken(token: string): Promise<Object> {
+    return this.JwtService.verifyAsync(token, {
+      secret: this.options.jwtOptions.secret,
+    });
   }
 
   private async validatePassword(

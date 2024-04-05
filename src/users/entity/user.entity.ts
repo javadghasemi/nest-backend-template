@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Product } from '../../products/entity/product.entity';
 
 @Entity()
 export class User {
@@ -31,4 +38,10 @@ export class User {
   @Column()
   @Exclude()
   public password: string;
+
+  @OneToMany(() => Product, (product) => product.createdBy)
+  public createdProducts: Product[];
+
+  @OneToMany(() => Product, (product) => product.updatedBy)
+  public updatedProducts: Product[];
 }

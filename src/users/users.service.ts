@@ -22,6 +22,10 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  public getById(id: number) {
+    return this.userRepository.findOneBy({ id });
+  }
+
   /**
    * @summary Get user by email address
    * @param email {string}
@@ -89,7 +93,7 @@ export class UsersService {
   public async delete(email: string): Promise<void> {
     const user: User = await this.getByEmail(email);
 
-    await this.userRepository.delete(user);
+    await this.userRepository.remove(user);
   }
 
   /**

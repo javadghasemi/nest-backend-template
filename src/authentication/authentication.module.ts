@@ -4,16 +4,19 @@ import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
-import { AuthenticationModuleOptions } from './interfaces/AuthenticationModuleOptions';
+import { AuthenticationModuleOptionsInterface } from './interfaces/authentication-module-options.interface';
 import { AuthenticationStrategy } from './enums';
 
 @Module({
   imports: [UsersModule],
   providers: [AuthenticationService],
   controllers: [AuthenticationController],
+  exports: [AuthenticationService],
 })
 export class AuthenticationModule {
-  static register(options: AuthenticationModuleOptions = {}): DynamicModule {
+  static forRoot(
+    options: AuthenticationModuleOptionsInterface = {},
+  ): DynamicModule {
     const imports: any[] = [UsersModule];
 
     if (options.strategy === AuthenticationStrategy.Bearer) {
@@ -21,6 +24,7 @@ export class AuthenticationModule {
     }
 
     return {
+      global: options.global || false,
       module: AuthenticationModule,
       imports,
       providers: [
