@@ -78,7 +78,15 @@ export class ProductsController {
     @Body() product: UpdateProductRequestDto,
     @User() user: LoggedInUserInterface,
   ): Promise<UpdateProductResponseDto> {
-    return this.productsService.update(productId, product, user);
+    try {
+      return await this.productsService.update(productId, product, user);
+    } catch (e) {
+      if (e instanceof HashidsNotValidException) {
+        throw new UnprocessableEntityException(e.message);
+      }
+
+      throw new InternalServerErrorException();
+    }
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

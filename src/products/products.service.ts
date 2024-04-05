@@ -82,7 +82,7 @@ export class ProductsService {
     product: UpdateProductRequestDto,
     user: LoggedInUserInterface,
   ): Promise<UpdateProductResponseDto> {
-    const id: number = this.hashids.decode(productId)[0] as number;
+    const id: number = this.decodeHashid(productId);
     const updatedProduct: Product = await this.productRepository.save({
       id,
       name: product.name,
