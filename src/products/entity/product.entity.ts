@@ -30,8 +30,11 @@ export class Product {
   @Column('text', { array: true })
   public photos: string[];
 
-  @ManyToOne(() => User, (user) => user.products)
+  @ManyToOne(() => User, (user) => user.createdProducts)
   public createdBy: User;
+
+  @ManyToOne(() => User, (user) => user.updatedProducts)
+  public updatedBy: User;
 
   @CreateDateColumn()
   public createdAt: Date;

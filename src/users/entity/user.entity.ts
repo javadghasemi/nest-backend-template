@@ -40,5 +40,8 @@ export class User {
   public password: string;
 
   @OneToMany(() => Product, (product) => product.createdBy)
-  public products: Product[];
+  public createdProducts: Product[];
+
+  @OneToMany(() => Product, (product) => product.updatedBy)
+  public updatedProducts: Product[];
 }
