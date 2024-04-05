@@ -11,15 +11,11 @@
       "always",
       [
         "build",
+        "feature",
         "chore",
-        "ci",
         "docs",
-        "feat",
         "fix",
-        "perf",
         "refactor",
-        "revert",
-        "style",
         "test",
         "sample"
       ]
@@ -28,16 +24,9 @@
       1,
       "always",
       [
-        "common",
-        "core",
-        "sample",
-        "microservices",
-        "express",
-        "fastify",
-        "socket.io",
-        "ws",
-        "testing",
-        "websockets"
+        "AuthenticationModule",
+        "ProductsModule",
+        "UsersModule"
       ]
     ]
   }
