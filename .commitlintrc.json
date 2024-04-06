@@ -24,9 +24,9 @@
       1,
       "always",
       [
-        "AuthenticationModule",
-        "ProductsModule",
-        "UsersModule"
+        "authentication",
+        "products",
+        "users"
       ]
     ]
   }
