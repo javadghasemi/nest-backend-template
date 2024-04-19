@@ -1,5 +1,4 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,12 +7,13 @@ import { AuthenticationModuleOptionsInterface } from './interfaces/authenticatio
 import { AuthenticationStrategy } from './enums';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './auth-strategy/local.strategy';
+import { AuthenticationSessionService } from './authentication-session.service';
+import { AuthenticationService } from './authentication.service';
+import { AuthenticationServiceInterface } from './interfaces/authentication-service.interface';
 
 @Module({
   imports: [UsersModule],
-  providers: [AuthenticationService],
   controllers: [AuthenticationController],
-  exports: [AuthenticationService],
 })
 export class AuthenticationModule {
   private static options: AuthenticationModuleOptionsInterface;
@@ -48,24 +48,43 @@ export class AuthenticationModule {
         ...providers,
       ],
       controllers: [AuthenticationController],
-      exports: [AuthenticationService],
     };
   }
 
   private static strategyFactory(): {
-    providers: any[];
     imports: any[];
+    providers: any[];
+    exports: any[];
   } {
-    const result = { imports: [], providers: [] };
+    const result = { imports: [], providers: [], exports: [] };
 
     switch (this.options.strategy) {
       case AuthenticationStrategy.Bearer:
         result.imports.push(JwtModule.register(this.options.jwtOptions));
-        result.providers.push(AuthenticationService);
+        result.providers.push({
+          provide: AuthenticationServiceInterface,
+          useClass: AuthenticationService,
+        });
+        result.exports.push({
+          provide: AuthenticationServiceInterface,
+          useClass: AuthenticationService,
+        });
         break;
+
       case AuthenticationStrategy.Session:
         result.imports.push(PassportModule);
-        result.providers.push(AuthenticationService, LocalStrategy);
+        result.providers.push(
+          {
+            provide: AuthenticationServiceInterface,
+            useClass: AuthenticationSessionService,
+          },
+          LocalStrategy,
+        );
+        result.exports.push({
+          provide: AuthenticationServiceInterface,
+          useClass: AuthenticationSessionService,
+        });
+
         break;
 
       default:

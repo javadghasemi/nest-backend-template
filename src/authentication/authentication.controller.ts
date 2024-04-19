@@ -5,7 +5,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
+  Request,
   UnauthorizedException,
   UseGuards,
   ValidationPipe,
@@ -17,14 +19,18 @@ import { CreateUserResponseDto } from '../users/dto/create-user-response.dto';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { WrongLoginInfoException } from './exception/wrong-login-info.exception';
 import { LoginResponseDto } from './dto/login-response.dto';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthenticationServiceInterface } from './interfaces/authentication-service.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller({
   version: '1',
   path: 'authentication',
 })
 export class AuthenticationController {
-  constructor(private authenticationService: AuthenticationService) {}
+  constructor(
+    @Inject(AuthenticationServiceInterface)
+    private authenticationService: AuthenticationServiceInterface,
+  ) {}
 
   @Post('signup')
   public async signup(
@@ -41,13 +47,15 @@ export class AuthenticationController {
     }
   }
 
+  @UseGuards(AuthGuard('local'))
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
     @Body(new ValidationPipe()) loginInfo: LoginRequestDto,
+    @Request() request,
   ): Promise<LoginResponseDto> {
     try {
-      return await this.authenticationService.login(loginInfo);
+      return request.user;
     } catch (e) {
       if (e instanceof WrongLoginInfoException) {
         throw new UnauthorizedException(e.message);
@@ -56,7 +64,7 @@ export class AuthenticationController {
   }
 
   @Get('protected')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard('local'))
   protected() {
     return 'ok';
   }

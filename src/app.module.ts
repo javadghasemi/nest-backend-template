@@ -30,7 +30,7 @@ import { Product } from './products/entity/product.entity';
     }),
     AuthenticationModule.forRoot({
       global: true,
-      strategy: AuthenticationStrategy.Bearer,
+      strategy: AuthenticationStrategy.Session,
       jwtOptions: {
         secret: 'THIS IS SECRET KEY',
         signOptions: {

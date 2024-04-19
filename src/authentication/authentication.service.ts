@@ -13,9 +13,10 @@ import { AuthenticationModuleOptionsInterface } from './interfaces/authenticatio
 import { AUTHENTICATION_MODULE_OPTIONS } from './constants';
 import { UserNotFoundException } from '../users/exception/user-not-found.exception';
 import { LoggedInUserInterface } from './interfaces/logged-in-user.interface';
+import { AuthenticationServiceInterface } from './interfaces/authentication-service.interface';
 
 @Injectable()
-export class AuthenticationService {
+export class AuthenticationService implements AuthenticationServiceInterface {
   constructor(
     private usersService: UsersService,
     private JwtService: JwtService,
@@ -61,7 +62,7 @@ export class AuthenticationService {
     return new LoginResponseDto(accessToken);
   }
 
-  public async validateToken(token: string): Promise<Object> {
+  public async validateToken(token: string): Promise<LoggedInUserInterface> {
     return this.JwtService.verifyAsync(token, {
       secret: this.options.jwtOptions.secret,
     });
